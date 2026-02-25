@@ -7,16 +7,40 @@ extends CharacterBody2D
 # Isometric movement basis vectors.
 # In isometric projection, "right" on the ground plane is (1, 0.5)
 # and "down" on the ground plane is (-1, 0.5) in screen space.
-# We use a 2:1 isometric ratio.
 const ISO_RIGHT := Vector2(1, 0.5)
 const ISO_DOWN := Vector2(-1, 0.5)
 
 
 func _ready() -> void:
 	add_to_group("player")
+	_ensure_input_actions()
 	# Restore position from GameState if we're returning from an era switch.
 	if GameState.player_position != Vector2.ZERO:
 		global_position = GameState.player_position
+
+
+func _ensure_input_actions() -> void:
+	# Register input actions in code as a safety net.
+	# If project.godot input map loaded fine, these are no-ops.
+	_add_key_action("move_up", KEY_W)
+	_add_key_action("move_down", KEY_S)
+	_add_key_action("move_left", KEY_A)
+	_add_key_action("move_right", KEY_D)
+	_add_key_action("switch_era", KEY_E)
+	_add_key_action("interact", KEY_F)
+
+
+func _add_key_action(action_name: String, keycode: Key) -> void:
+	if not InputMap.has_action(action_name):
+		InputMap.add_action(action_name)
+	# Check if the action already has events. If so, don't duplicate.
+	var events = InputMap.action_get_events(action_name)
+	if events.size() > 0:
+		return
+	var event := InputEventKey.new()
+	event.keycode = keycode
+	event.physical_keycode = keycode
+	InputMap.action_add_event(action_name, event)
 
 
 func _physics_process(_delta: float) -> void:
@@ -52,8 +76,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _try_interact() -> void:
-	# Check for interactable objects in range.
-	# Uses the interaction area (Area2D child) if it exists.
 	var area = get_node_or_null("InteractionArea")
 	if not area:
 		return
