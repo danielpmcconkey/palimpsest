@@ -12,6 +12,9 @@ mono_crash.*.json
 # Import cache
 .import/
 
+# Debug
+debug.log
+
 # OS generated
 .DS_Store
 Thumbs.db
