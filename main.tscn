@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmainscene"]
+
+[ext_resource type="PackedScene" uid="uid://cera1level" path="res://levels/test_era1.tscn" id="1_era1"]
+
+[node name="Main" type="Node"]
+
+[node name="TestEra1" parent="." instance=ExtResource("1_era1")]
